@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1a1a17">
+<title>FallGravity · the algorithm is blind to quality</title>
+<meta name="description" content="LinkedIn algorithm strategy tool. Plan posts that exploit the rules. Score · hooks · timing · boost window · carousel builder. Single HTML · sovereign · on-device.">
+<link rel="manifest" href='data:application/manifest+json,{"name":"FallGravity","short_name":"Gravity","start_url":".","display":"standalone","background_color":"#1a1a17","theme_color":"#d4a017","icons":[{"src":"data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 fill=%22%231a1a17%22/><circle cx=%2232%22 cy=%2232%22 r=%2222%22 fill=%22none%22 stroke=%22%23d4a017%22 stroke-width=%223%22/><circle cx=%2232%22 cy=%2232%22 r=%228%22 fill=%22%23d4a017%22/></svg>","sizes":"any","type":"image/svg+xml"}]}'>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+:root {
+  --bg: #1a1a17;
+  --bg-2: #23231f;
+  --bg-3: #2d2d28;
+  --line: #3a3a33;
+  --text: #f5f1e8;
+  --muted: #948f80;
+  --gold: #d4a017;
+  --gold-dim: #a47d10;
+  --green: #44aa44;
+  --red: #ff4444;
+  --amber: #ff9933;
+  --blue: #4a9eff;
+  --r: 12px;
+}
+html, body { background: var(--bg); color: var(--text); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; min-height: 100dvh; -webkit-font-smoothing: antialiased; }
+body { padding-bottom: env(safe-area-inset-bottom); }
+h1, h2, h3 { font-family: 'Syne', system-ui, sans-serif; font-weight: 700; letter-spacing: -0.02em; }
+h1 { font-size: 22px; }
+h2 { font-size: 18px; }
+h3 { font-size: 14px; color: var(--gold); text-transform: uppercase; letter-spacing: 0.06em; }
+
+header { padding: 14px 16px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--bg); z-index: 50; backdrop-filter: blur(8px); }
+.top { display: flex; align-items: center; justify-content: space-between; max-width: 720px; margin: 0 auto; }
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand-mark {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: radial-gradient(circle, var(--gold) 30%, transparent 32%), conic-gradient(from 0deg, var(--gold) 0deg, transparent 90deg, var(--gold) 180deg, transparent 270deg, var(--gold) 360deg);
+  border: 2px solid var(--gold);
+  display: grid; place-items: center;
+}
+.brand-name { font-family: 'Syne'; font-weight: 800; font-size: 18px; }
+.brand-sub { color: var(--muted); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
+.top-btn { background: var(--bg-2); border: 1px solid var(--line); color: var(--text); padding: 8px 12px; border-radius: 8px; font-size: 13px; cursor: pointer; font-family: inherit; }
+.top-btn:active { background: var(--bg-3); }
+
+main { padding: 16px; max-width: 720px; margin: 0 auto; padding-bottom: 96px; }
+.view { display: none; }
+.view.active { display: block; }
+
+.card { background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; margin-bottom: 16px; }
+.card-hd { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.row:last-child { border-bottom: none; }
+.row .lbl { color: var(--muted); }
+.row .val { font-weight: 600; }
+.row .val.gold { color: var(--gold); }
+.row .val.green { color: var(--green); }
+.row .val.red { color: var(--red); }
+.row .val.amber { color: var(--amber); }
+
+.btn { background: var(--gold); color: #1a1a17; border: none; padding: 14px 18px; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; touch-action: manipulation; font-family: inherit; width: 100%; }
+.btn:active { transform: scale(0.98); }
+.btn:hover { background: var(--gold-dim); }
+.btn.secondary { background: var(--bg-3); color: var(--text); border: 1px solid var(--line); }
+.btn.green { background: var(--green); color: #fff; }
+.btn.red { background: var(--red); color: #fff; }
+.btn.small { padding: 8px 14px; font-size: 13px; width: auto; }
+
+.field { margin-bottom: 12px; }
+.field label { display: block; color: var(--muted); font-size: 12px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+.field input, .field select, .field textarea { width: 100%; background: var(--bg); border: 1px solid var(--line); color: var(--text); padding: 12px; border-radius: 8px; font-size: 15px; font-family: inherit; }
+.field input:focus, .field select:focus, .field textarea:focus { outline: 2px solid var(--gold); outline-offset: -1px; }
+.field textarea { min-height: 120px; resize: vertical; line-height: 1.5; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 380px) { .field-row { grid-template-columns: 1fr; } }
+
+/* ═══ SCORE GAUGE ═══ */
+.score-total { text-align: center; padding: 12px 0; }
+.score-num { font-family: 'Syne'; font-weight: 800; font-size: 64px; line-height: 1; color: var(--gold); }
+.score-num.green { color: var(--green); }
+.score-num.amber { color: var(--amber); }
+.score-num.red { color: var(--red); }
+.score-max { color: var(--muted); font-size: 18px; font-weight: 600; }
+.score-label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; margin-top: 4px; }
+
+.bar { height: 8px; background: var(--bg-3); border-radius: 4px; overflow: hidden; position: relative; margin-top: 4px; }
+.bar-fill { height: 100%; background: var(--gold); transition: width 0.3s ease; }
+.bar-fill.green { background: var(--green); }
+.bar-fill.amber { background: var(--amber); }
+.bar-fill.red { background: var(--red); }
+
+.score-row { padding: 10px 0; border-bottom: 1px solid var(--line); }
+.score-row:last-child { border-bottom: none; }
+.score-row .hd { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 4px; }
+.score-row .why { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+.warn { background: rgba(255, 68, 68, 0.1); border: 1px solid var(--red); padding: 12px; border-radius: 8px; margin: 10px 0; font-size: 13px; }
+.good { background: rgba(68, 170, 68, 0.1); border: 1px solid var(--green); padding: 12px; border-radius: 8px; margin: 10px 0; font-size: 13px; }
+.tip { background: rgba(212,160,23,0.08); border-left: 3px solid var(--gold); padding: 10px 12px; border-radius: 0 8px 8px 0; margin: 8px 0; font-size: 13px; }
+
+/* ═══ HOOKS ═══ */
+.hook-item { background: var(--bg-3); border-radius: 8px; padding: 12px; margin-bottom: 10px; border: 1px solid var(--line); }
+.hook-item .type { color: var(--gold); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; font-weight: 700; }
+.hook-item .text { font-size: 14px; line-height: 1.5; white-space: pre-wrap; }
+.hook-item .actions { display: flex; gap: 6px; margin-top: 8px; }
+.hook-item .actions button { background: var(--bg); border: 1px solid var(--line); color: var(--text); padding: 5px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; font-family: inherit; }
+.hook-item .actions button:active { background: var(--gold); color: #1a1a17; }
+
+/* ═══ BOOST WINDOW ═══ */
+.countdown { text-align: center; padding: 20px 0; }
+.countdown-time { font-family: 'Syne'; font-weight: 800; font-size: 56px; line-height: 1; color: var(--gold); letter-spacing: 0.02em; }
+.countdown-label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 6px; }
+
+.target { padding: 10px 0; border-bottom: 1px solid var(--line); }
+.target:last-child { border-bottom: none; }
+.target .hd { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 6px; }
+.target .progress { height: 12px; background: var(--bg-3); border-radius: 6px; overflow: hidden; }
+.target .progress-fill { height: 100%; background: var(--gold); transition: width 0.4s ease; }
+.target .progress-fill.green { background: var(--green); }
+
+.guild-member { background: var(--bg-3); border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+.guild-member .info { font-size: 14px; }
+.guild-member .name { font-weight: 600; }
+.guild-member .affinity { color: var(--muted); font-size: 12px; margin-top: 2px; }
+.guild-member .actions button { background: none; border: 1px solid var(--line); color: var(--muted); padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; font-family: inherit; }
+
+/* ═══ NAV ═══ */
+nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg-2); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(5, 1fr); padding: 6px 4px calc(8px + env(safe-area-inset-bottom)); z-index: 60; }
+.tab { background: none; border: none; color: var(--muted); padding: 8px 4px; font-size: 11px; font-family: inherit; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 6px; touch-action: manipulation; }
+.tab.active { color: var(--gold); }
+.tab .ic { font-size: 18px; }
+
+/* ═══ MODAL ═══ */
+.modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; display: none; align-items: flex-end; }
+.modal-bg.open { display: flex; }
+.modal { background: var(--bg-2); width: 100%; max-width: 720px; margin: 0 auto; border-radius: 16px 16px 0 0; padding: 20px; max-height: 90vh; overflow-y: auto; padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
+.modal-hd { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.modal-close { background: none; border: none; color: var(--muted); font-size: 28px; cursor: pointer; padding: 0 8px; line-height: 1; }
+
+.toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--gold); color: #1a1a17; padding: 10px 20px; border-radius: 24px; font-weight: 700; z-index: 200; opacity: 0; transition: opacity 0.2s, transform 0.2s; pointer-events: none; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(-10px); }
+
+/* ═══ CAROUSEL SLIDES ═══ */
+.slide { background: linear-gradient(135deg, #1a1a17 0%, #2a2a23 100%); border: 1px solid var(--gold); border-radius: 12px; padding: 32px 24px; margin-bottom: 12px; aspect-ratio: 1 / 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; position: relative; }
+.slide .num { position: absolute; top: 12px; right: 16px; color: var(--gold); font-family: 'Syne'; font-weight: 700; font-size: 14px; }
+.slide .text { font-family: 'Syne'; font-weight: 700; font-size: 22px; line-height: 1.25; color: var(--text); }
+.slide .text[contenteditable] { outline: 1px dashed var(--gold); outline-offset: 4px; }
+.slide.cta .text { color: var(--gold); }
+
+.empty { text-align: center; padding: 36px 16px; color: var(--muted); }
+.empty .icon { font-size: 40px; opacity: 0.4; margin-bottom: 10px; }
+
+footer { text-align: center; padding: 20px; color: var(--muted); font-size: 11px; }
+footer a { color: var(--gold); text-decoration: none; }
+
+.muted { color: var(--muted); }
+.hint { color: var(--muted); font-size: 12px; margin-top: 6px; }
+.tag { display: inline-block; background: var(--bg-3); color: var(--muted); padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-right: 4px; }
+.tag.gold { color: var(--gold); }
+.tag.green { color: var(--green); }
+.tag.red { color: var(--red); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="top">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div>
+        <div class="brand-name">FallGravity</div>
+        <div class="brand-sub">play by its rules · flip the game</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:6px">
+      <button class="top-btn" id="btnTier">offline</button>
+      <button class="top-btn" id="btnSettings">⚙</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ═══ COMPOSE — score + hooks + format ═══ -->
+<section class="view active" id="view-compose">
+  <div class="card">
+    <h2>Compose</h2>
+    <p class="muted" style="font-size:13px;margin-bottom:10px">Draft your post. Get scored against the algorithm in real time. Generate hooks. Pick the format the algo rewards.</p>
+    <div class="field">
+      <label>Post topic (1 line)</label>
+      <input id="postTopic" placeholder='"Built an accounting tool for builders in one HTML file"'>
+    </div>
+    <div class="field">
+      <label>Post draft (paste here)</label>
+      <textarea id="postDraft" placeholder='Type or paste your draft. We score live as you type.' oninput="liveScore()"></textarea>
+      <div class="hint" id="charCount">0 chars · sweet spot 800-1500</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn small" onclick="generateHooks()">⚡ Generate 5 hooks</button>
+      <button class="btn small secondary" onclick="convertToCarousel()">📊 Convert to carousel</button>
+      <button class="btn small secondary" onclick="formatAdvice()">📐 Format advice</button>
+    </div>
+  </div>
+
+  <div class="card" id="scoreCard" style="display:none">
+    <div class="card-hd">
+      <h3>α score · algorithm fit</h3>
+      <span class="muted" style="font-size:11px" id="scoreUpdated">just now</span>
+    </div>
+    <div class="score-total">
+      <div><span class="score-num" id="scoreTotal">0</span><span class="score-max">/80</span></div>
+      <div class="score-label" id="scoreVerdict">paste a draft</div>
+    </div>
+    <div id="scoreBreakdown"></div>
+    <div id="scoreTips"></div>
+  </div>
+
+  <div class="card" id="hooksCard" style="display:none">
+    <div class="card-hd"><h3>5 hooks · first 2 lines</h3></div>
+    <p class="muted" style="font-size:12px;margin-bottom:10px">Only the first 2 lines show in the feed. These are designed to maximise "see more" clicks.</p>
+    <div id="hooksList"></div>
+  </div>
+
+  <div class="card" id="formatCard" style="display:none">
+    <div class="card-hd"><h3>Format advice</h3></div>
+    <div id="formatBody"></div>
+  </div>
+</section>
+
+<!-- ═══ BOOST · 90-min window ═══ -->
+<section class="view" id="view-boost">
+  <div class="card">
+    <div class="card-hd">
+      <h2>Boost window</h2>
+      <span class="muted" id="boostStatus">not posted</span>
+    </div>
+    <div class="countdown">
+      <div class="countdown-time" id="countdownTime">--:--</div>
+      <div class="countdown-label" id="countdownLabel">paste your post URL to start the timer</div>
+    </div>
+    <div class="field">
+      <label>Your post URL (just published)</label>
+      <input id="postURL" placeholder="linkedin.com/posts/..." oninput="checkStartTimer()">
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn small" onclick="startBoostWindow()">▶ Start 90-min window</button>
+      <button class="btn small secondary" onclick="alertGuild()">📢 Alert guild</button>
+      <button class="btn small secondary" onclick="stopBoost()">⏹ Stop</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Engagement targets</h3>
+    <div class="target">
+      <div class="hd"><span>Min · 5 comments</span><span id="t1Status">0/5</span></div>
+      <div class="progress"><div class="progress-fill" id="t1Bar" style="width:0%"></div></div>
+    </div>
+    <div class="target">
+      <div class="hd"><span>Good · 10 comments + 20 reactions</span><span id="t2Status">0/10 c · 0/20 r</span></div>
+      <div class="progress"><div class="progress-fill" id="t2Bar" style="width:0%"></div></div>
+    </div>
+    <div class="target">
+      <div class="hd"><span>Great · 15 comments + 3 deep threads</span><span id="t3Status">0/15 c · 0/3 t</span></div>
+      <div class="progress"><div class="progress-fill" id="t3Bar" style="width:0%"></div></div>
+    </div>
+    <div class="field" style="margin-top:14px">
+      <label>Log engagement (update as it lands)</label>
+      <div class="field-row">
+        <div class="field"><label>Comments</label><input id="liveComments" type="number" min="0" value="0" oninput="updateTargets()"></div>
+        <div class="field"><label>Reactions</label><input id="liveReactions" type="number" min="0" value="0" oninput="updateTargets()"></div>
+      </div>
+      <div class="field-row" style="margin-top:0">
+        <div class="field"><label>Reposts</label><input id="liveReposts" type="number" min="0" value="0" oninput="updateTargets()"></div>
+        <div class="field"><label>Threads (3+ deep)</label><input id="liveThreads" type="number" min="0" value="0" oninput="updateTargets()"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd">
+      <h3>Comment responder · δ</h3>
+    </div>
+    <p class="muted" style="font-size:12px;margin-bottom:10px">The secret weapon: reply to every comment in the first hour. <b>Your</b> replies count most.</p>
+    <div class="field">
+      <label>Incoming comment</label>
+      <textarea id="incomingComment" placeholder='"Great insights on sovereign architecture! How does this work for teams larger than 10?"'></textarea>
+    </div>
+    <button class="btn small" onclick="draftReplies()">⚡ Draft 3 reply suggestions</button>
+    <div id="replySuggestions" style="margin-top:12px"></div>
+  </div>
+</section>
+
+<!-- ═══ CAROUSEL builder ═══ -->
+<section class="view" id="view-carousel">
+  <div class="card">
+    <h2>Carousel builder</h2>
+    <p class="muted" style="font-size:13px;margin-bottom:10px">Carousels get +20-40% reach vs text-only. We convert your draft to slides — one idea per slide.</p>
+    <div class="field">
+      <label>Number of slides</label>
+      <select id="slideCount">
+        <option value="5">5 slides · tight</option>
+        <option value="7" selected>7 slides · standard</option>
+        <option value="10">10 slides · deep</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn small" onclick="buildCarousel()">📊 Convert draft to slides</button>
+      <button class="btn small secondary" onclick="exportSlides()">📥 Export as text</button>
+    </div>
+  </div>
+  <div id="slidesOut"></div>
+</section>
+
+<!-- ═══ ANALYTICS · history + insights ═══ -->
+<section class="view" id="view-analytics">
+  <div class="card">
+    <div class="card-hd">
+      <h2>Analytics</h2>
+      <button class="btn small" onclick="showLogModal()">+ Log post</button>
+    </div>
+    <p class="muted" style="font-size:13px;margin-bottom:10px">Log after each post (LinkedIn has no public API). ε learns what works for your audience over time.</p>
+    <div id="analyticsBody"></div>
+  </div>
+
+  <div class="card" id="insightsCard" style="display:none">
+    <div class="card-hd"><h3>ε insights</h3></div>
+    <div id="insightsBody"></div>
+  </div>
+
+  <div class="card">
+    <h3>Anti-patterns · what NOT to do</h3>
+    <div class="warn"><b>Never:</b> auto-post · engagement pods · edit within 10 min · external link in body · &gt;5 hashtags · post 2× in 24h · tag people who didn't ask</div>
+    <div class="good"><b>Always:</b> reply to every comment in first hour · engage 3-5 other posts before/after · link in first comment · native media · ask a question · post in your optimal window</div>
+  </div>
+</section>
+
+<!-- ═══ GUILD · roster ═══ -->
+<section class="view" id="view-guild">
+  <div class="card">
+    <div class="card-hd">
+      <h2>Guild</h2>
+      <button class="btn small" onclick="showGuildAddModal()">+ Add member</button>
+    </div>
+    <p class="muted" style="font-size:13px;margin-bottom:10px">Genuine mutual supporters. γ alerts them when you post — only if their topic affinity matches. No spam, no pods.</p>
+    <div id="guildList"></div>
+  </div>
+  <div class="card">
+    <h3>Timing advisor · β</h3>
+    <p class="muted" style="font-size:12px;margin-bottom:8px">Optimal LinkedIn post windows for UK/US professional audience:</p>
+    <div class="row"><span class="lbl">UK/EU window</span><span class="val gold">Tue–Thu · 07:00–08:30 GMT</span></div>
+    <div class="row"><span class="lbl">US window</span><span class="val gold">Tue–Thu · 14:00–15:00 GMT</span></div>
+    <div class="row"><span class="lbl">Your local time</span><span class="val" id="localTime">—</span></div>
+    <div class="row"><span class="lbl">Next UK window</span><span class="val gold" id="nextUKWindow">—</span></div>
+    <div class="row"><span class="lbl">Next US window</span><span class="val gold" id="nextUSWindow">—</span></div>
+    <div class="row"><span class="lbl">Avoid</span><span class="val red">weekends · Monday · Friday PM</span></div>
+  </div>
+</section>
+
+<footer>
+  FallGravity · ◊·κ=1 · single HTML · on-device · <a href="https://github.com/sjgant80-hub/fallgravity" target="_blank">source</a>
+</footer>
+
+</main>
+
+<nav>
+  <button class="tab active" data-view="compose"><span class="ic">✎</span>Compose</button>
+  <button class="tab" data-view="boost"><span class="ic">⚡</span>Boost</button>
+  <button class="tab" data-view="carousel"><span class="ic">⬚</span>Carousel</button>
+  <button class="tab" data-view="analytics"><span class="ic">▣</span>Analytics</button>
+  <button class="tab" data-view="guild"><span class="ic">◯</span>Guild</button>
+</nav>
+
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <div class="modal-hd">
+      <h2 id="modalTitle">·</h2>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast">·</div>
+
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════
+// FallGravity · sovereign LinkedIn algorithm strategy
+// ◊·κ=1 · v19 · prime 199
+// ═══════════════════════════════════════════
+
+const VERSION = '1.0.0';
+const PRIME = 199;
+const STORE = 'fallgravity-state';
+
+let state = {
+  posts: [],          // logged post history
+  guild: [],          // roster: {id, name, profile, affinity[], lastEngaged}
+  boost: {            // current boost window state
+    active: false,
+    startedAt: 0,
+    postURL: '',
+    targets: { comments: 0, reactions: 0, reposts: 0, threads: 0 },
+  },
+  carousels: [],      // saved drafts
+  kcc: [],
+  settings: {
+    yourName: 'Simon',
+    yourTimezone: 'Asia/Bangkok',  // GMT+7
+    yourTopics: ['tech', 'AI', 'sovereign tools', 'indie hacking'],
+    anthropicKey: '',
+    openaiKey: '',
+    geminiKey: '',
+    openrouterKey: '',
+  },
+  meta: { created: Date.now(), version: VERSION },
+};
+
+async function saveState() {
+  try { localStorage.setItem(STORE, JSON.stringify(state)); } catch (e) {}
+}
+async function loadState() {
+  try { const raw = localStorage.getItem(STORE); if (raw) state = Object.assign(state, JSON.parse(raw)); } catch (e) {}
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._to);
+  t._to = setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+function escHTML(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+
+// ═══ CASCADE · same shim pattern as FallAccount Trades ═══
+const Cascade = {
+  async detectTier() {
+    if (await Cascade._probeLocal()) return 'T2';
+    const s = state.settings;
+    if (s.anthropicKey || s.openaiKey || s.geminiKey || s.openrouterKey) return 'T3';
+    return 'T0';
+  },
+  async _probeLocal() {
+    if (Cascade._localProbed !== undefined) return Cascade._localProbed;
+    try {
+      const r = await Promise.race([
+        fetch('http://127.0.0.1:11434/api/tags').then(r => r.ok),
+        new Promise(res => setTimeout(() => res(false), 400)),
+      ]);
+      Cascade._localProbed = !!r;
+    } catch (e) { Cascade._localProbed = false; }
+    return Cascade._localProbed;
+  },
+  async generate(prompt) {
+    const s = state.settings;
+    if (s.anthropicKey) try {
+      const r = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-api-key': s.anthropicKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+        body: JSON.stringify({ model: 'claude-haiku-4-5', max_tokens: 1200, messages: [{ role: 'user', content: prompt }] })
+      });
+      const d = await r.json();
+      return { tier: 'T3·Claude', text: d?.content?.[0]?.text || '' };
+    } catch (e) {}
+    if (s.openaiKey) try {
+      const r = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + s.openaiKey },
+        body: JSON.stringify({ model: 'gpt-4o-mini', messages: [{ role: 'user', content: prompt }] })
+      });
+      const d = await r.json();
+      return { tier: 'T3·GPT', text: d?.choices?.[0]?.message?.content || '' };
+    } catch (e) {}
+    if (s.geminiKey) try {
+      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${s.geminiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+      });
+      const d = await r.json();
+      return { tier: 'T3·Gemini', text: d?.candidates?.[0]?.content?.parts?.[0]?.text || '' };
+    } catch (e) {}
+    if (s.openrouterKey) try {
+      const r = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + s.openrouterKey, 'HTTP-Referer': location.origin },
+        body: JSON.stringify({ model: 'anthropic/claude-haiku-4-5', messages: [{ role: 'user', content: prompt }] })
+      });
+      const d = await r.json();
+      return { tier: 'T3·OpenRouter', text: d?.choices?.[0]?.message?.content || '' };
+    } catch (e) {}
+    if (await Cascade._probeLocal()) try {
+      const r = await fetch('http://127.0.0.1:11434/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: 'llama3.2', prompt, stream: false })
+      });
+      const d = await r.json();
+      return { tier: 'T2·local', text: d?.response || '' };
+    } catch (e) {}
+    return { tier: 'T0', text: null };
+  },
+};
+
+const KCC = {
+  log(ring, action, w = 1) {
+    state.kcc = (state.kcc || []).concat([{ ts: Date.now(), ring, action, w }]).slice(-500);
+    saveState();
+    try { new BroadcastChannel('fall-signal').postMessage({ source: 'fallgravity', type: 'kcc', ring, action, w, ts: Date.now() }); } catch (e) {}
+  },
+};
+
+// ═══ VIEW ROUTER ═══
+function switchView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.view === name));
+  if (name === 'analytics') renderAnalytics();
+  if (name === 'guild') { renderGuild(); renderTimingWindows(); }
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => switchView(t.dataset.view)));
+
+// ═══════════════════════════════════════════
+// AGENT α · POST SCORER · 8 dimensions /80
+// ═══════════════════════════════════════════
+function scorePost(text) {
+  const t = String(text || '');
+  const lines = t.split('\n');
+  const firstTwo = lines.slice(0, 2).join('\n');
+  const wordCount = (t.match(/\S+/g) || []).length;
+  const charCount = t.length;
+
+  // 1. HOOK STRENGTH /10
+  let hook = 0;
+  if (/^[A-Z]/.test(t)) hook += 1;
+  if (/[?!.]/.test(firstTwo)) hook += 1;
+  if (/\b(I|you|my|your|we|our)\b/i.test(firstTwo)) hook += 2;          // personal pronouns
+  if (/\d+/.test(firstTwo)) hook += 2;                                    // numbers
+  if (/(but|however|though|except|even|despite|surprising|secret)/i.test(firstTwo)) hook += 1;
+  if (firstTwo.length > 40 && firstTwo.length < 200) hook += 2;
+  if (/(what if|imagine|here's|listen|stop|never)/i.test(firstTwo)) hook += 2;
+  hook = Math.min(10, hook);
+
+  // 2. DWELL TRIGGERS /10
+  let dwell = 0;
+  if (lines.length > 4) dwell += 2;                          // line breaks
+  if (/\n\s*\n/.test(t)) dwell += 2;                         // empty lines = paragraph breaks
+  if (/^[\s]*[-•*▶◊→·][\s]/m.test(t)) dwell += 2;           // bullet/list
+  if (/—|–/.test(t)) dwell += 1;                              // em/en dash = pattern interrupt
+  if (/\.\.\./.test(t)) dwell += 1;                          // ellipsis
+  if (/\b[A-Z]{3,}\b/.test(t)) dwell += 1;                   // ALL CAPS chunks
+  if (charCount > 600) dwell += 1;
+  dwell = Math.min(10, dwell);
+
+  // 3. COMMENT BAIT /10
+  let bait = 0;
+  if (/\?/.test(t)) bait += 2;
+  if (/\?[^?]*$/.test(t)) bait += 2;                         // ends in a question
+  if (/(what do you think|your take|disagree|agree|thoughts|let me know|tell me)/i.test(t)) bait += 3;
+  if (/(unpopular|controversial|hot take|opinion|wrong|right)/i.test(t)) bait += 2;
+  if (/(builders|developers|founders|engineers|designers|marketers)/i.test(t)) bait += 1;  // community call
+  bait = Math.min(10, bait);
+
+  // 4. SAVE POTENTIAL /10
+  let save = 0;
+  if (/(framework|method|system|process|approach|steps?|playbook|guide)/i.test(t)) save += 2;
+  if (/\b(1\.|2\.|3\.|first|second|third|then|finally)\b/i.test(t)) save += 3;
+  if (/(how to|tutorial|breakdown|deep dive|explained)/i.test(t)) save += 2;
+  if (/(checklist|template|formula|principle|rule)/i.test(t)) save += 2;
+  if (wordCount > 150) save += 1;
+  save = Math.min(10, save);
+
+  // 5. EXTERNAL LINK PENALTY (-30 if found in body, not first comment)
+  const linkInBody = /(https?:\/\/(?!linkedin\.com)[^\s]+)/.test(t);
+  const linkPenalty = linkInBody ? -30 : 0;
+
+  // 6. HASHTAG COUNT /5
+  const hashCount = (t.match(/#\w+/g) || []).length;
+  const hashScore = hashCount === 0 ? 3 : hashCount <= 3 ? 5 : hashCount <= 5 ? 3 : 0;
+  const hashPenalty = hashCount > 5;
+
+  // 7. LENGTH /5
+  let lengthScore = 0;
+  if (charCount >= 800 && charCount <= 1500) lengthScore = 5;
+  else if (charCount >= 500 && charCount < 800) lengthScore = 4;
+  else if (charCount > 1500 && charCount <= 2500) lengthScore = 3;
+  else if (charCount >= 300) lengthScore = 2;
+  else if (charCount >= 100) lengthScore = 1;
+
+  // 8. "SEE MORE" CLICK PROBABILITY /10 — function of hook + cliffhanger
+  const seeMore = Math.min(10, Math.round(hook * 0.7 + (firstTwo.length > 80 ? 3 : 1)));
+
+  const baseTotal = hook + dwell + bait + save + hashScore + lengthScore + seeMore;
+  const total = Math.max(0, baseTotal + linkPenalty);
+
+  return {
+    total, baseTotal, max: 80,
+    breakdown: [
+      { key: 'hook',     label: 'Hook strength (first 2 lines)',    score: hook,       max: 10, why: hook < 5 ? 'lead with tension, a question, or numbers — not context' : 'strong opening' },
+      { key: 'dwell',    label: 'Dwell triggers (pattern breaks)',  score: dwell,      max: 10, why: dwell < 5 ? 'add line breaks, lists, em-dashes to force the scroll to slow' : 'good visual rhythm' },
+      { key: 'bait',     label: 'Comment bait',                     score: bait,       max: 10, why: bait < 5 ? 'add a question · invite disagreement · call out a community' : 'invites engagement' },
+      { key: 'save',     label: 'Save potential',                   score: save,       max: 10, why: save < 5 ? 'add a framework, list, or how-to to make it reference-worthy' : 'reference-worthy' },
+      { key: 'hashtag',  label: 'Hashtags (' + hashCount + ')',     score: hashScore,  max: 5,  why: hashPenalty ? 'remove hashtags — over 5 triggers penalty' : (hashCount === 0 ? 'add 2-3 relevant hashtags' : 'good count') },
+      { key: 'length',   label: 'Length (' + charCount + ' chars)', score: lengthScore, max: 5,  why: charCount < 500 ? 'too short for the algo · aim for 800-1500' : (charCount > 2500 ? 'too long · risk of cut-off' : 'sweet spot') },
+      { key: 'seemore',  label: '"See more" click probability',     score: seeMore,    max: 10, why: 'how compelling the first 2 lines are vs the rest' },
+    ],
+    flags: {
+      externalLink: linkInBody,
+      tooManyHashtags: hashPenalty,
+    },
+  };
+}
+
+function liveScore() {
+  const text = document.getElementById('postDraft').value;
+  document.getElementById('charCount').textContent = text.length + ' chars · sweet spot 800-1500';
+  if (!text.trim()) {
+    document.getElementById('scoreCard').style.display = 'none';
+    return;
+  }
+  document.getElementById('scoreCard').style.display = 'block';
+  const s = scorePost(text);
+  const card = document.getElementById('scoreTotal');
+  card.textContent = s.total;
+  card.className = 'score-num ' + (s.total >= 55 ? 'green' : s.total >= 35 ? 'amber' : 'red');
+  const verdict = s.total >= 55 ? '◊ this will fly' : s.total >= 35 ? 'solid · could go further' : 'needs work · see tips below';
+  document.getElementById('scoreVerdict').textContent = verdict;
+
+  document.getElementById('scoreBreakdown').innerHTML = s.breakdown.map(b => {
+    const pct = (b.score / b.max) * 100;
+    const cls = pct >= 70 ? 'green' : pct >= 40 ? '' : 'red';
+    return `
+      <div class="score-row">
+        <div class="hd"><span>${escHTML(b.label)}</span><span class="val ${cls}">${b.score}/${b.max}</span></div>
+        <div class="bar"><div class="bar-fill ${cls}" style="width:${pct}%"></div></div>
+        <div class="why">${escHTML(b.why)}</div>
+      </div>`;
+  }).join('');
+
+  const tips = [];
+  if (s.flags.externalLink) tips.push('<div class="warn">⚠ External link in post body → ~30-50% reach penalty. <b>Move it to the first comment</b> instead.</div>');
+  if (s.flags.tooManyHashtags) tips.push('<div class="warn">⚠ Over 5 hashtags → slight penalty. Pick the 3 most relevant.</div>');
+  if (s.breakdown.find(b => b.key === 'hook').score < 5) tips.push('<div class="tip">💡 Weak hook. Try one of the 5 generators below.</div>');
+  if (s.breakdown.find(b => b.key === 'save').score < 3) tips.push('<div class="tip">💡 Low save-potential. Add a numbered list, framework, or how-to.</div>');
+  if (s.breakdown.find(b => b.key === 'bait').score < 4) tips.push('<div class="tip">💡 Ends without a question. Add one — it triggers comments.</div>');
+  document.getElementById('scoreTips').innerHTML = tips.join('');
+
+  document.getElementById('scoreUpdated').textContent = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+}
+
+// ═══════════════════════════════════════════
+// AGENT α · HOOK GENERATOR · 5 types per topic
+// ═══════════════════════════════════════════
+const HOOK_TYPES = ['story', 'reveal', 'problem', 'question', 'paradox'];
+
+function generateHookT0(topic) {
+  const t = topic.trim() || 'something you built';
+  const word = t.split(/\s+/);
+  const subject = word.slice(0, 3).join(' ');
+  return [
+    {
+      type: 'story',
+      text: `My mate has dirt on his hands and three minutes between jobs.\nThis is ${t.toLowerCase()}.`,
+    },
+    {
+      type: 'reveal',
+      text: `One file. Zero subscription. ${Math.floor(Math.random() * 50 + 60)}KB.\nThe most overpowered thing nobody knows is overpowered.`,
+    },
+    {
+      type: 'problem',
+      text: `Every accounting/CRM/tool app charges £20/month to hold your data hostage.\nSo I built one that doesn't.`,
+    },
+    {
+      type: 'question',
+      text: `What if your software worked offline, cost nothing, and fit on a USB stick?\nHere's what happens when it does.`,
+    },
+    {
+      type: 'paradox',
+      text: `I asked someone what they wanted from this software.\nThey said "nothing."\nSo I built that.`,
+    },
+  ];
+}
+
+async function generateHooks() {
+  const topic = document.getElementById('postTopic').value.trim();
+  if (!topic) { toast('Add a topic first'); return; }
+  document.getElementById('hooksCard').style.display = 'block';
+  document.getElementById('hooksList').innerHTML = '<div class="muted">generating...</div>';
+
+  KCC.log('R4', 'hook_gen', 1);
+
+  // T3 if available — sharper, contextual
+  const tier = await Cascade.detectTier();
+  let hooks = generateHookT0(topic);
+  if (tier !== 'T0') {
+    try {
+      const prompt = `You are a LinkedIn hook generator. Generate 5 different opening hooks for a post about: "${topic}"
+
+Each hook is the first 2 lines of a LinkedIn post (only these 2 lines show before "see more").
+
+The 5 hooks must be in these distinct styles:
+1. STORY — personal, visual, a real person doing a real thing
+2. REVEAL — numbers/specs/scale that create a curiosity gap
+3. PROBLEM/SOLUTION — name the enemy, then the hero
+4. QUESTION — a hypothetical that challenges assumptions
+5. PARADOX — counterintuitive framing
+
+Each hook: 1-3 sentences max, 40-180 chars total. Personal voice (use I/my/you). Designed to maximise "see more" clicks.
+
+Reply ONLY as JSON array:
+[{"type":"story","text":"..."},{"type":"reveal","text":"..."},{"type":"problem","text":"..."},{"type":"question","text":"..."},{"type":"paradox","text":"..."}]`;
+      const r = await Cascade.generate(prompt);
+      if (r.text) {
+        const json = r.text.match(/\[[\s\S]*\]/)?.[0];
+        if (json) {
+          const arr = JSON.parse(json);
+          if (Array.isArray(arr) && arr.length) hooks = arr;
+        }
+      }
+    } catch (e) { /* use T0 */ }
+  }
+
+  document.getElementById('hooksList').innerHTML = hooks.map((h, i) => `
+    <div class="hook-item">
+      <div class="type">${i + 1} · ${escHTML(h.type || 'hook')}</div>
+      <div class="text">${escHTML(h.text)}</div>
+      <div class="actions">
+        <button onclick="useHook(${i})">use this</button>
+        <button onclick="copyHook(${i})">copy</button>
+      </div>
+    </div>`).join('');
+  window._lastHooks = hooks;
+}
+
+function useHook(i) {
+  const h = window._lastHooks[i];
+  if (!h) return;
+  const draft = document.getElementById('postDraft');
+  draft.value = h.text + (draft.value ? '\n\n' + draft.value : '');
+  liveScore();
+  toast('Hook applied');
+  switchView('compose');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function copyHook(i) {
+  const h = window._lastHooks[i];
+  if (!h) return;
+  navigator.clipboard.writeText(h.text).then(() => toast('Copied'));
+}
+
+// ═══════════════════════════════════════════
+// FORMAT ADVISOR
+// ═══════════════════════════════════════════
+function formatAdvice() {
+  const draft = document.getElementById('postDraft').value;
+  const topic = document.getElementById('postTopic').value;
+  if (!draft && !topic) { toast('Add draft or topic'); return; }
+  document.getElementById('formatCard').style.display = 'block';
+
+  const text = draft || topic;
+  const wordCount = (text.match(/\S+/g) || []).length;
+  const hasNumbers = /\d+/.test(text);
+  const hasList = /\n\s*[-•*1-9]/.test(text);
+  const isHowTo = /(how to|how i|guide|tutorial|breakdown)/i.test(text);
+  const isHotTake = /(should|must|never|always|wrong|unpopular|opinion)/i.test(text);
+  const isPersonal = /\b(my mate|my friend|my client|I built|I made)\b/i.test(text);
+  const hasFramework = /(framework|method|system|principle|rule|step)/i.test(text);
+
+  const recs = [];
+  if (hasFramework || hasList) recs.push({ format: 'CAROUSEL', why: 'has framework/list structure · +20-40% reach vs text-only', tag: 'gold' });
+  if (isHowTo && wordCount > 200) recs.push({ format: 'CAROUSEL', why: 'how-to is carousel-native · one step per slide', tag: 'gold' });
+  if (isHotTake && wordCount < 300) recs.push({ format: 'TEXT', why: 'opinions land hardest as text · keep it punchy', tag: 'gold' });
+  if (isPersonal) recs.push({ format: 'TEXT', why: 'personal stories work as text · readers want voice', tag: '' });
+  if (wordCount > 500) recs.push({ format: 'DOCUMENT', why: 'deep content · upload as PDF for no-link-penalty hosting', tag: '' });
+  if (hasNumbers && /\d+\s*(%|x|×)/.test(text)) recs.push({ format: 'IMAGE', why: 'metric-driven · screenshot the result · native image > text', tag: '' });
+  if (recs.length === 0) recs.push({ format: 'TEXT', why: '800-1500 chars sweet spot · native, no penalty', tag: '' });
+
+  document.getElementById('formatBody').innerHTML = recs.map((r, i) => `
+    <div class="${i === 0 ? 'good' : 'tip'}">
+      <div><b>${i === 0 ? '◊ Best fit · ' : ''}${escHTML(r.format)}</b></div>
+      <div class="muted" style="font-size:12px;margin-top:4px">${escHTML(r.why)}</div>
+    </div>`).join('') + `
+    <div style="margin-top:10px"><span class="muted" style="font-size:12px">Pure text? OK. But carousels +20-40% · documents bypass link penalty · video rewards if &gt;50% watch · polls = reach but low quality.</span></div>`;
+}
+
+// ═══════════════════════════════════════════
+// CAROUSEL BUILDER
+// ═══════════════════════════════════════════
+async function buildCarousel() {
+  const draft = document.getElementById('postDraft').value.trim();
+  const topic = document.getElementById('postTopic').value.trim();
+  if (!draft && !topic) { toast('Add a draft first'); return; }
+  const n = +document.getElementById('slideCount').value || 7;
+
+  // T0: split into paragraphs / sentences / use template
+  let slides = buildCarouselT0(draft || topic, n);
+
+  const tier = await Cascade.detectTier();
+  if (tier !== 'T0' && draft) {
+    document.getElementById('slidesOut').innerHTML = '<div class="muted" style="text-align:center;padding:20px">building with ' + tier + '...</div>';
+    try {
+      const prompt = `You are converting a LinkedIn post into a ${n}-slide carousel. Each slide:
+- Big bold statement, one idea only
+- 5-12 words MAX
+- Like a punchy headline, not a paragraph
+- Slide 1 = HOOK · Slide ${n} = CTA / question
+- Slides between = problem · solution · proof · key insight · philosophy
+
+Input post:
+${draft}
+
+Reply ONLY as JSON array of ${n} strings:
+["slide 1 text","slide 2 text",...,"slide ${n} text"]`;
+      const r = await Cascade.generate(prompt);
+      if (r.text) {
+        const json = r.text.match(/\[[\s\S]*\]/)?.[0];
+        if (json) {
+          const arr = JSON.parse(json);
+          if (Array.isArray(arr) && arr.length) slides = arr.slice(0, n);
+        }
+      }
+    } catch (e) {}
+  }
+
+  window._lastSlides = slides;
+  document.getElementById('slidesOut').innerHTML = slides.map((s, i) => {
+    const isCTA = i === slides.length - 1;
+    return `<div class="slide ${isCTA ? 'cta' : ''}">
+      <div class="num">${i + 1}/${slides.length}</div>
+      <div class="text" contenteditable="true" oninput="editSlide(${i}, this.textContent)">${escHTML(s)}</div>
+    </div>`;
+  }).join('');
+  KCC.log('R4', 'carousel', 2);
+}
+
+function buildCarouselT0(text, n) {
+  const sentences = text.split(/(?<=[.!?])\s+/).filter(s => s.trim().length > 5);
+  if (sentences.length >= n) return sentences.slice(0, n).map(s => s.trim().slice(0, 80));
+  // Fallback templates
+  const templates = [
+    'The hook that opens the post',
+    'The problem nobody talks about',
+    'The solution most people miss',
+    'How it actually works (the surprise)',
+    'The proof — numbers, before/after, results',
+    'The philosophy underneath',
+    'What you do with this · soft CTA',
+  ];
+  while (sentences.length < n) sentences.push(templates[sentences.length % templates.length]);
+  return sentences.slice(0, n);
+}
+
+function editSlide(i, text) {
+  if (window._lastSlides) window._lastSlides[i] = text;
+}
+
+function exportSlides() {
+  if (!window._lastSlides) { toast('Build slides first'); return; }
+  const text = window._lastSlides.map((s, i) => `Slide ${i + 1}/${window._lastSlides.length}\n${s}`).join('\n\n---\n\n');
+  const blob = new Blob([text], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `carousel-${new Date().toISOString().slice(0,10)}.txt`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  toast('Slides exported · use as your carousel script');
+}
+
+function convertToCarousel() {
+  switchView('carousel');
+  setTimeout(buildCarousel, 100);
+}
+
+// ═══════════════════════════════════════════
+// BOOST WINDOW · γ
+// ═══════════════════════════════════════════
+let boostInterval = null;
+
+function checkStartTimer() {
+  const url = document.getElementById('postURL').value.trim();
+  if (url && url.includes('linkedin.com')) {
+    document.getElementById('countdownLabel').textContent = 'URL captured · tap "Start" to begin window';
+  }
+}
+
+function startBoostWindow() {
+  const url = document.getElementById('postURL').value.trim();
+  if (!url) { toast('Paste post URL first'); return; }
+  state.boost = {
+    active: true, startedAt: Date.now(), postURL: url,
+    targets: { comments: 0, reactions: 0, reposts: 0, threads: 0 },
+  };
+  saveState();
+  KCC.log('R6', 'boost_start', 3);
+  if (boostInterval) clearInterval(boostInterval);
+  boostInterval = setInterval(updateBoostCountdown, 1000);
+  updateBoostCountdown();
+  document.getElementById('boostStatus').textContent = 'live';
+  toast('⚡ 90-min window started');
+}
+
+function updateBoostCountdown() {
+  if (!state.boost.active) return;
+  const elapsed = Date.now() - state.boost.startedAt;
+  const remaining = 90 * 60 * 1000 - elapsed;
+  if (remaining <= 0) {
+    document.getElementById('countdownTime').textContent = '00:00';
+    document.getElementById('countdownLabel').textContent = 'window closed · log final metrics';
+    clearInterval(boostInterval);
+    state.boost.active = false;
+    saveState();
+    return;
+  }
+  const m = Math.floor(remaining / 60000);
+  const s = Math.floor((remaining % 60000) / 1000);
+  document.getElementById('countdownTime').textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  document.getElementById('countdownLabel').textContent = m > 60 ? 'kill zone active · reply to every comment' : (m > 30 ? 'engagement window' : 'final push');
+}
+
+function stopBoost() {
+  state.boost.active = false;
+  if (boostInterval) clearInterval(boostInterval);
+  saveState();
+  document.getElementById('boostStatus').textContent = 'stopped';
+  toast('Boost stopped');
+}
+
+function updateTargets() {
+  const c = +document.getElementById('liveComments').value || 0;
+  const r = +document.getElementById('liveReactions').value || 0;
+  const rp = +document.getElementById('liveReposts').value || 0;
+  const th = +document.getElementById('liveThreads').value || 0;
+  state.boost.targets = { comments: c, reactions: r, reposts: rp, threads: th };
+  saveState();
+
+  document.getElementById('t1Status').textContent = `${c}/5`;
+  document.getElementById('t1Bar').style.width = Math.min(100, (c / 5) * 100) + '%';
+  document.getElementById('t1Bar').className = 'progress-fill ' + (c >= 5 ? 'green' : '');
+
+  const t2pct = Math.min(100, ((c / 10) * 0.5 + (r / 20) * 0.5) * 100);
+  document.getElementById('t2Status').textContent = `${c}/10 c · ${r}/20 r`;
+  document.getElementById('t2Bar').style.width = t2pct + '%';
+  document.getElementById('t2Bar').className = 'progress-fill ' + (c >= 10 && r >= 20 ? 'green' : '');
+
+  const t3pct = Math.min(100, ((c / 15) * 0.5 + (th / 3) * 0.5) * 100);
+  document.getElementById('t3Status').textContent = `${c}/15 c · ${th}/3 t`;
+  document.getElementById('t3Bar').style.width = t3pct + '%';
+  document.getElementById('t3Bar').className = 'progress-fill ' + (c >= 15 && th >= 3 ? 'green' : '');
+}
+
+function alertGuild() {
+  const topic = document.getElementById('postTopic').value || 'a new post';
+  const url = state.boost.postURL || document.getElementById('postURL').value;
+  if (!url) { toast('Need post URL'); return; }
+  const topics = (topic.toLowerCase().match(/\w+/g) || []);
+  const matched = state.guild.filter(m => (m.affinity || []).some(a => topics.includes(a.toLowerCase())));
+  const audience = matched.length ? matched : state.guild;
+  if (!audience.length) { toast('Guild empty · add members first'); switchView('guild'); return; }
+
+  try {
+    const sig = new BroadcastChannel('fall-signal');
+    sig.postMessage({
+      source: 'fallgravity', type: 'boost_alert',
+      url, topic, members: audience.map(m => m.id), ts: Date.now()
+    });
+  } catch (e) {}
+
+  KCC.log('R4', 'guild_alert', audience.length);
+  toast(`📢 Alerted ${audience.length} guild member${audience.length === 1 ? '' : 's'}`);
+}
+
+// ═══════════════════════════════════════════
+// AGENT δ · COMMENT RESPONDER
+// ═══════════════════════════════════════════
+async function draftReplies() {
+  const comment = document.getElementById('incomingComment').value.trim();
+  if (!comment) { toast('Paste a comment first'); return; }
+  document.getElementById('replySuggestions').innerHTML = '<div class="muted">drafting...</div>';
+
+  // T0 templates
+  const replies = [
+    {
+      tone: 'depth',
+      text: `Good question. The thinking behind it was [specific design choice] — because [tradeoff that matters]. Curious what your stack looks like for this — does the same problem show up there?`,
+    },
+    {
+      tone: 'casual',
+      text: `Yeah this was the bit that surprised me too. Once [one concrete observation] it kind of forced the architecture into [your approach]. Different shape than people expect.`,
+    },
+    {
+      tone: 'technical',
+      text: `Specifically: [the technical detail]. The reason this matters is [downstream consequence]. Happy to go deeper — which bit do you want me to unpack?`,
+    },
+  ];
+
+  const tier = await Cascade.detectTier();
+  let final = replies;
+  if (tier !== 'T0') {
+    try {
+      const prompt = `You are drafting 3 reply suggestions to a LinkedIn comment on the user's own post. Each reply:
+- 2-4 sentences
+- Longer than the comment (dwell time)
+- Adds NEW information (save potential)
+- Ends inviting more discussion (thread depth)
+- Different TONE for each: (1) DEPTH/substantive (2) CASUAL/conversational (3) TECHNICAL/precise
+- Voice: confident, helpful, never sucking up
+
+Incoming comment:
+"${comment}"
+
+User context (if relevant): builds sovereign single-file HTML tools, indie, UK-based, name Simon.
+
+Reply ONLY as JSON: [{"tone":"depth","text":"..."},{"tone":"casual","text":"..."},{"tone":"technical","text":"..."}]`;
+      const r = await Cascade.generate(prompt);
+      if (r.text) {
+        const json = r.text.match(/\[[\s\S]*\]/)?.[0];
+        if (json) {
+          const arr = JSON.parse(json);
+          if (Array.isArray(arr) && arr.length) final = arr;
+        }
+      }
+    } catch (e) {}
+  }
+
+  KCC.log('R4', 'reply_draft', 1);
+
+  document.getElementById('replySuggestions').innerHTML = final.map((rep, i) => `
+    <div class="hook-item">
+      <div class="type">${escHTML(rep.tone)}</div>
+      <div class="text">${escHTML(rep.text)}</div>
+      <div class="actions">
+        <button onclick="copyReply(${i})">copy</button>
+      </div>
+    </div>`).join('');
+  window._lastReplies = final;
+}
+
+function copyReply(i) {
+  const r = window._lastReplies?.[i];
+  if (r) navigator.clipboard.writeText(r.text).then(() => toast('Copied'));
+}
+
+// ═══════════════════════════════════════════
+// AGENT β · TIMING WINDOWS
+// ═══════════════════════════════════════════
+function renderTimingWindows() {
+  const now = new Date();
+  document.getElementById('localTime').textContent = now.toLocaleString('en-GB', { weekday: 'short', hour: '2-digit', minute: '2-digit' });
+
+  // Next UK window: Tue-Thu 07:00-08:30 GMT
+  document.getElementById('nextUKWindow').textContent = nextWindow(now, [2, 3, 4], 7, 8.5, 0);  // GMT
+  // Next US window: Tue-Thu 14:00-15:00 GMT
+  document.getElementById('nextUSWindow').textContent = nextWindow(now, [2, 3, 4], 14, 15, 0);  // GMT
+}
+
+function nextWindow(now, days, hStart, hEnd, gmtOffset) {
+  for (let d = 0; d < 10; d++) {
+    const t = new Date(now.getTime() + d * 86400000);
+    const dow = t.getUTCDay();  // 0=Sun
+    if (!days.includes(dow)) continue;
+    t.setUTCHours(hStart, 0, 0, 0);
+    if (t > now) return t.toLocaleString('en-GB', { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }) + ' GMT';
+  }
+  return '—';
+}
+
+// ═══════════════════════════════════════════
+// ANALYTICS · ε
+// ═══════════════════════════════════════════
+function renderAnalytics() {
+  const body = document.getElementById('analyticsBody');
+  if (!state.posts.length) {
+    body.innerHTML = `<div class="empty"><div class="icon">▣</div><h3 style="color:var(--text);margin-bottom:4px">No posts logged yet</h3><p>Log your first post (date, metrics, format) and ε starts learning what works for your audience.</p></div>`;
+    document.getElementById('insightsCard').style.display = 'none';
+    return;
+  }
+  const sorted = [...state.posts].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+  body.innerHTML = sorted.slice(0, 30).map(p => {
+    const score = (p.reactions || 0) + (p.comments || 0) * 3 + (p.saves || 0) * 5;
+    return `<div class="hook-item">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <div><span class="tag gold">${escHTML(p.format)}</span><b>${escHTML(p.topic || 'post')}</b></div>
+        <div class="muted" style="font-size:11px">${p.date}</div>
+      </div>
+      <div class="muted" style="font-size:12px">
+        ${p.reactions || 0} react · ${p.comments || 0} comm · ${p.reposts || 0} rep ${p.saves ? '· ' + p.saves + ' saves' : ''}
+        ${p.boost ? '· <span class="tag gold">boosted</span>' : ''}
+        ${p.link ? '· <span class="tag red">had link</span>' : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  // ε insights
+  renderEpsilonInsights();
+}
+
+function renderEpsilonInsights() {
+  const posts = state.posts;
+  if (posts.length < 3) { document.getElementById('insightsCard').style.display = 'none'; return; }
+  const insights = [];
+
+  // Best format
+  const byFormat = {};
+  posts.forEach(p => {
+    if (!p.format) return;
+    if (!byFormat[p.format]) byFormat[p.format] = { count: 0, totalEng: 0 };
+    byFormat[p.format].count++;
+    byFormat[p.format].totalEng += (p.reactions || 0) + (p.comments || 0) * 3;
+  });
+  const formatRanked = Object.entries(byFormat).map(([f, v]) => ({ f, avg: v.totalEng / v.count, n: v.count })).sort((a, b) => b.avg - a.avg);
+  if (formatRanked.length > 1) {
+    const best = formatRanked[0], worst = formatRanked[formatRanked.length - 1];
+    if (best.avg > worst.avg * 1.5) insights.push(`<b>${escHTML(best.f)}</b> gets <b>${(best.avg / worst.avg).toFixed(1)}×</b> the engagement of <b>${escHTML(worst.f)}</b>. Lean into ${escHTML(best.f)}.`);
+  }
+
+  // Link penalty
+  const withLink = posts.filter(p => p.link);
+  const noLink = posts.filter(p => !p.link);
+  if (withLink.length >= 2 && noLink.length >= 2) {
+    const avgWith = withLink.reduce((s, p) => s + ((p.reactions || 0) + (p.comments || 0) * 3), 0) / withLink.length;
+    const avgNo = noLink.reduce((s, p) => s + ((p.reactions || 0) + (p.comments || 0) * 3), 0) / noLink.length;
+    if (avgNo > avgWith * 1.3) insights.push(`Posts WITHOUT links average <b>${((avgNo / avgWith - 1) * 100).toFixed(0)}% more engagement</b> than posts with links. Move links to first comment.`);
+  }
+
+  // Boost impact
+  const boosted = posts.filter(p => p.boost);
+  const unboosted = posts.filter(p => !p.boost);
+  if (boosted.length >= 2 && unboosted.length >= 2) {
+    const avgB = boosted.reduce((s, p) => s + ((p.reactions || 0) + (p.comments || 0) * 3), 0) / boosted.length;
+    const avgU = unboosted.reduce((s, p) => s + ((p.reactions || 0) + (p.comments || 0) * 3), 0) / unboosted.length;
+    if (avgB > avgU * 1.2) insights.push(`Guild-boosted posts get <b>${((avgB / avgU - 1) * 100).toFixed(0)}% more engagement</b>. Worth the 90-min window.`);
+  }
+
+  if (!insights.length) { document.getElementById('insightsCard').style.display = 'none'; return; }
+  document.getElementById('insightsCard').style.display = 'block';
+  document.getElementById('insightsBody').innerHTML = insights.map(i => `<div class="tip">${i}</div>`).join('');
+}
+
+function showLogModal() {
+  showModal('Log a post', `
+    <div class="field"><label>Topic</label><input id="lgTopic" placeholder="What was it about?"></div>
+    <div class="field-row">
+      <div class="field"><label>Date</label><input id="lgDate" type="date" value="${new Date().toISOString().slice(0,10)}"></div>
+      <div class="field"><label>Format</label>
+        <select id="lgFormat">
+          <option>TEXT</option><option>CAROUSEL</option><option>DOCUMENT</option><option>POLL</option><option>IMAGE</option><option>VIDEO</option>
+        </select>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Impressions</label><input id="lgImp" type="number" min="0"></div>
+      <div class="field"><label>Reactions</label><input id="lgReact" type="number" min="0"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Comments</label><input id="lgComm" type="number" min="0"></div>
+      <div class="field"><label>Reposts</label><input id="lgRep" type="number" min="0"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Saves (if visible)</label><input id="lgSaves" type="number" min="0"></div>
+      <div class="field"><label>Hashtag count</label><input id="lgHash" type="number" min="0"></div>
+    </div>
+    <div class="field"><label><input type="checkbox" id="lgLink"> Had external link in body</label></div>
+    <div class="field"><label><input type="checkbox" id="lgBoost"> Used guild boost window</label></div>
+    <button class="btn" onclick="saveLogPost()">Save</button>
+  `);
+}
+
+async function saveLogPost() {
+  const p = {
+    id: uid(),
+    topic: document.getElementById('lgTopic').value.trim(),
+    date: document.getElementById('lgDate').value,
+    format: document.getElementById('lgFormat').value,
+    impressions: +document.getElementById('lgImp').value || 0,
+    reactions: +document.getElementById('lgReact').value || 0,
+    comments: +document.getElementById('lgComm').value || 0,
+    reposts: +document.getElementById('lgRep').value || 0,
+    saves: +document.getElementById('lgSaves').value || 0,
+    hashtags: +document.getElementById('lgHash').value || 0,
+    link: document.getElementById('lgLink').checked,
+    boost: document.getElementById('lgBoost').checked,
+    loggedAt: Date.now(),
+  };
+  state.posts.push(p);
+  await saveState();
+  KCC.log('R6', 'post_log', 1);
+  closeModal();
+  toast('Logged');
+  renderAnalytics();
+}
+
+// ═══════════════════════════════════════════
+// GUILD · roster
+// ═══════════════════════════════════════════
+function renderGuild() {
+  const root = document.getElementById('guildList');
+  if (!state.guild.length) {
+    root.innerHTML = `<div class="empty"><div class="icon">◯</div><h3 style="color:var(--text);margin-bottom:4px">Empty guild</h3><p>Add genuine mutual supporters. γ alerts them when their topic affinity matches your post.</p></div>`;
+    return;
+  }
+  root.innerHTML = state.guild.map(m => `
+    <div class="guild-member">
+      <div class="info">
+        <div class="name">${escHTML(m.name)}</div>
+        <div class="affinity">${(m.affinity || []).map(a => '<span class="tag">' + escHTML(a) + '</span>').join('')}</div>
+      </div>
+      <div class="actions">
+        <button onclick="removeGuild('${m.id}')">remove</button>
+      </div>
+    </div>`).join('');
+}
+
+function showGuildAddModal() {
+  showModal('Add guild member', `
+    <div class="field"><label>Name</label><input id="gmName" placeholder="Thomas Frumkin"></div>
+    <div class="field"><label>LinkedIn profile (optional)</label><input id="gmProfile" placeholder="linkedin.com/in/..."></div>
+    <div class="field"><label>Topic affinity (comma-separated)</label><input id="gmAffinity" placeholder="tech, AI, music, audio"></div>
+    <button class="btn" onclick="saveGuildMember()">Add</button>
+  `);
+}
+
+async function saveGuildMember() {
+  const m = {
+    id: uid(),
+    name: document.getElementById('gmName').value.trim(),
+    profile: document.getElementById('gmProfile').value.trim(),
+    affinity: document.getElementById('gmAffinity').value.split(',').map(s => s.trim()).filter(Boolean),
+  };
+  if (!m.name) { toast('Need a name'); return; }
+  state.guild.push(m);
+  await saveState();
+  closeModal();
+  renderGuild();
+  toast('Added');
+}
+
+async function removeGuild(id) {
+  if (!confirm('Remove from guild?')) return;
+  state.guild = state.guild.filter(g => g.id !== id);
+  await saveState();
+  renderGuild();
+  toast('Removed');
+}
+
+// ═══════════════════════════════════════════
+// MODALS · settings
+// ═══════════════════════════════════════════
+function showModal(title, body) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = body;
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+document.getElementById('modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
+
+document.getElementById('btnSettings').addEventListener('click', () => {
+  showModal('Settings', `
+    <div class="field"><label>Your name</label><input id="stName" value="${escHTML(state.settings.yourName)}"></div>
+    <h3 style="margin:18px 0 8px">AI keys (any one unlocks T3)</h3>
+    <p class="muted" style="font-size:12px;margin-bottom:8px">Sharpens hooks, replies, carousel content. <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--gold)">Gemini is free</a>. All keys stay on this device.</p>
+    <div class="field"><label>Anthropic · Claude</label><input id="stAnthropic" type="password" value="${escHTML(state.settings.anthropicKey)}"></div>
+    <div class="field"><label>OpenAI · GPT</label><input id="stOpenAI" type="password" value="${escHTML(state.settings.openaiKey)}"></div>
+    <div class="field"><label>Gemini · free tier</label><input id="stGemini" type="password" value="${escHTML(state.settings.geminiKey)}"></div>
+    <div class="field"><label>OpenRouter · any</label><input id="stOpenRouter" type="password" value="${escHTML(state.settings.openrouterKey)}"></div>
+    <h3 style="margin:18px 0 8px">Backup</h3>
+    <div style="display:flex;gap:8px">
+      <button class="btn small secondary" onclick="exportAll()">📥 Export JSON</button>
+      <button class="btn small secondary" onclick="importAll()">📤 Restore</button>
+    </div>
+    <div style="margin-top:20px;text-align:center;color:var(--muted);font-size:11px">
+      FallGravity · v${VERSION} · ◊·κ=1 · prime ${PRIME}<br>
+      the algorithm is blind to quality · exploit the blindness
+    </div>
+    <div style="margin-top:14px"><button class="btn" onclick="saveSettings()">Save</button></div>
+  `);
+});
+
+async function saveSettings() {
+  state.settings.yourName = document.getElementById('stName').value;
+  state.settings.anthropicKey = document.getElementById('stAnthropic').value;
+  state.settings.openaiKey = document.getElementById('stOpenAI').value;
+  state.settings.geminiKey = document.getElementById('stGemini').value;
+  state.settings.openrouterKey = document.getElementById('stOpenRouter').value;
+  Cascade._localProbed = undefined;
+  await saveState();
+  await updateTierBadge();
+  closeModal();
+  toast('Saved');
+}
+
+function exportAll() {
+  const data = JSON.stringify({ exported: new Date().toISOString(), version: VERSION, state }, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `fallgravity-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  toast('Backup downloaded');
+}
+
+function importAll() {
+  const i = document.createElement('input');
+  i.type = 'file'; i.accept = 'application/json,.json';
+  i.onchange = async () => {
+    const f = i.files[0]; if (!f) return;
+    const text = await f.text();
+    try {
+      const obj = JSON.parse(text);
+      if (obj.state) {
+        if (!confirm('REPLACE all current data?')) return;
+        state = Object.assign(state, obj.state);
+        await saveState();
+        closeModal();
+        toast('Restored');
+      }
+    } catch (e) { toast('Bad backup'); }
+  };
+  i.click();
+}
+
+async function updateTierBadge() {
+  const tier = await Cascade.detectTier();
+  document.getElementById('btnTier').textContent = tier === 'T0' ? 'offline' : tier;
+}
+
+// ═══ KONOMI ═══
+window.KONOMI = { active: true, tier: 'sovereign', check: () => ({ ok: true, tier: 'sovereign' }) };
+
+// ═══ FALLMESH ═══
+try {
+  const sig = new BroadcastChannel('fall-signal');
+  sig.postMessage({ source: 'fallgravity', type: 'hello', prime: PRIME, version: VERSION, ts: Date.now() });
+  sig.addEventListener('message', e => {
+    const m = e.data;
+    if (!m) return;
+    if (m.type === 'ping') sig.postMessage({ source: 'fallgravity', type: 'pong', prime: PRIME });
+    if (m.type === 'boost_alert' && m.source !== 'fallgravity') {
+      // Show notification in-app
+      console.log('[fall-signal] boost alert from', m.source, m);
+    }
+  });
+} catch (e) {}
+
+// ═══ postMessage API ═══
+window.addEventListener('message', async (e) => {
+  const m = e.data;
+  if (!m || m.target !== 'fallgravity' || !m.action) return;
+  let resp = null;
+  if (m.action === 'ping') resp = { ok: true, prime: PRIME, version: VERSION };
+  else if (m.action === 'score') resp = scorePost(m.text || '');
+  else if (m.action === 'hooks') resp = generateHookT0(m.topic || '');
+  else if (m.action === 'boost_state') resp = state.boost;
+  e.source?.postMessage({ target: m.source || '*', responseTo: m.action, data: resp }, '*');
+});
+
+// ═══ BOOT ═══
+(async function init() {
+  await loadState();
+  await updateTierBadge();
+  renderTimingWindows();
+  if (state.boost.active && (Date.now() - state.boost.startedAt) < 90 * 60 * 1000) {
+    boostInterval = setInterval(updateBoostCountdown, 1000);
+    updateBoostCountdown();
+    document.getElementById('postURL').value = state.boost.postURL || '';
+    document.getElementById('liveComments').value = state.boost.targets.comments;
+    document.getElementById('liveReactions').value = state.boost.targets.reactions;
+    document.getElementById('liveReposts').value = state.boost.targets.reposts;
+    document.getElementById('liveThreads').value = state.boost.targets.threads;
+    updateTargets();
+  }
+})();
+</script>
+</body>
+</html>
